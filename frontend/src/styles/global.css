@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+:root {
+  --gold: #c8a96a;
+  --black: #0d0d0d;
+  --text: #ffffff;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Whatsapp Button */
+.whatsappButton {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+
+  width: 50px;
+  height: 50px;
+
+  background: linear-gradient(135deg, #c4a15b, #C8A96A);
+  color: black;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+  font-size: 28px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  z-index: 9999;
+
+  transition: all 0.3s ease;
+}
+
+.whatsappButton:hover {
+  transform: scale(1.1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0d0d; /* fundo escuro */
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c9a14a, #e6c06b);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e6c06b, #c9a14a);
+}

@@ -1,0 +1,175 @@
+.section {
+  padding: 120px 0;
+  background: #3b2f2b;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* HEADER */
+
+.header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.subtitle {
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: 3rem;
+  color: #fff;
+  margin-top: 10px;
+}
+
+.title span {
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* GRID */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 80px;
+}
+
+/* INFO */
+
+.description {
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  font-size: 15px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.item {
+  display: flex;
+  gap: 15px;
+  text-decoration: none;
+}
+
+.iconBox {
+  width: 45px;
+  height: 45px;
+  border: 1px solid rgba(201,161,74,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  transition: 0.3s;
+}
+
+.item:hover .iconBox {
+  background: var(--gold);
+  color: #000;
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.5);
+}
+
+.value {
+  color: #fff;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* FORM */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form input,
+.form textarea {
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 14px;
+  color: #fff;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.form input:focus,
+.form textarea:focus {
+  border-color: var(--gold);
+  outline: none;
+}
+
+.form textarea {
+  min-height: 140px;
+  resize: none;
+}
+
+/* BUTTON */
+
+.button {
+  background: var(--gold);
+  color: #000;
+  padding: 16px;
+  border: none;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(201,161,74,0.35);
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .title {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 40px;
+  }
+}
