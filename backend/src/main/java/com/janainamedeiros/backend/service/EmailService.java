@@ -2,92 +2,106 @@ package com.janainamedeiros.backend.service;
 
 import com.janainamedeiros.backend.dto.ContactDTO;
 import com.janainamedeiros.backend.model.Appointment;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Async;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    private String sendEmail(String to, String subject, String htmlContent) {
+        try {
+            String apiKey = System.getenv("RESEND_API_KEY");
+
+            URL url = new URL(RESEND_API_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            String body = "{"
+                    + "\"from\": \"onboarding@resend.dev\","
+                    + "\"to\": [\"" + to + "\"],"
+                    + "\"subject\": \"" + subject + "\","
+                    + "\"html\": \"" + htmlContent.replace("\"", "\\\"") + "\""
+                    + "}";
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(body.getBytes());
+            }
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("Email enviado para " + to + " - Status: " + responseCode);
+
+            return "OK";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERRO";
+        }
     }
 
     @Async
     public void sendConfirmation(Appointment a) {
 
         String clientEmail = a.getEmail().trim().toLowerCase();
-        String adminEmail = "gustavosimon4g@gmail.com"; // seu email
+        String adminEmail = "gustavosimon4g@gmail.com";
 
         // =========================
-        // 📩 EMAIL PARA CLIENTE
+        // 📩 CLIENTE
         // =========================
-        SimpleMailMessage clientMsg = new SimpleMailMessage();
-
-        clientMsg.setFrom("gustavosimon4g@gmail.com");
-        clientMsg.setTo(clientEmail);
-        clientMsg.setSubject("Confirmação de Agendamento");
-
-        clientMsg.setText(
-            "Olá " + a.getName() + ",\n\n" +
-            "Seu agendamento foi confirmado:\n\n" +
-            "📅 Data: " + a.getDate() + "\n" +
-            "⏰ Horário: " + a.getTime() + "\n" +
-            "📌 Serviço: " + a.getService() + "\n\n" +
-            "Atenciosamente,\nJSM Advocacia"
-        );
+        String clientHtml =
+                "<h2>Confirmação de Agendamento</h2>" +
+                "<p>Olá " + a.getName() + ",</p>" +
+                "<p>Seu agendamento foi confirmado:</p>" +
+                "<ul>" +
+                "<li><b>Data:</b> " + a.getDate() + "</li>" +
+                "<li><b>Horário:</b> " + a.getTime() + "</li>" +
+                "<li><b>Serviço:</b> " + a.getService() + "</li>" +
+                "</ul>" +
+                "<p>Atenciosamente,<br/>JSM Advocacia</p>";
 
         // =========================
-        // 📩 EMAIL PARA ADMIN (VOCÊ)
+        // 📩 ADMIN
         // =========================
-        SimpleMailMessage adminMsg = new SimpleMailMessage();
+        String adminHtml =
+                "<h2>Novo Agendamento Recebido</h2>" +
+                "<ul>" +
+                "<li><b>Nome:</b> " + a.getName() + "</li>" +
+                "<li><b>Email:</b> " + clientEmail + "</li>" +
+                "<li><b>Telefone:</b> " + a.getPhone() + "</li>" +
+                "<li><b>Data:</b> " + a.getDate() + "</li>" +
+                "<li><b>Horário:</b> " + a.getTime() + "</li>" +
+                "<li><b>Serviço:</b> " + a.getService() + "</li>" +
+                "<li><b>Mensagem:</b> " + a.getMessage() + "</li>" +
+                "</ul>";
 
-        adminMsg.setFrom("gustavosimon4g@gmail.com");
-        adminMsg.setTo(adminEmail);
-        adminMsg.setSubject("📥 Novo Agendamento Recebido");
-
-        adminMsg.setText(
-            "Novo agendamento recebido:\n\n" +
-            "👤 Nome: " + a.getName() + "\n" +
-            "📧 Email: " + clientEmail + "\n" +
-            "📞 Telefone: " + a.getPhone() + "\n\n" +
-            "📅 Data: " + a.getDate() + "\n" +
-            "⏰ Horário: " + a.getTime() + "\n" +
-            "📌 Serviço: " + a.getService() + "\n\n" +
-            "📝 Mensagem: " + a.getMessage()
-        );
-
-        // =========================
-        // 🚀 ENVIO
-        // =========================
         System.out.println("Enviando email para cliente...");
-        mailSender.send(clientMsg);
+        sendEmail(clientEmail, "Confirmação de Agendamento", clientHtml);
 
         System.out.println("Enviando email para admin...");
-        mailSender.send(adminMsg);
+        sendEmail(adminEmail, "Novo Agendamento Recebido", adminHtml);
 
-        System.out.println("Emails enviados com sucesso!");
+        System.out.println("Emails enviados (via API)");
     }
 
     @Async
     public void sendContact(ContactDTO dto) {
 
-        SimpleMailMessage msg = new SimpleMailMessage();
+        String html =
+                "<h2>Novo Contato</h2>" +
+                "<p><b>Nome:</b> " + dto.getName() + "</p>" +
+                "<p><b>Email:</b> " + dto.getEmail() + "</p>" +
+                "<p><b>Assunto:</b> " + dto.getSubject() + "</p>" +
+                "<p><b>Mensagem:</b><br/>" + dto.getMessage() + "</p>";
 
-        msg.setFrom("gustavosimon4g@gmail.com");
-        msg.setTo("gustavosimon4g@gmail.com");
-        msg.setReplyTo(dto.getEmail());
-        msg.setSubject("Novo contato do site");
-        msg.setText(
-            "Nome: " + dto.getName() + "\n" +
-            "Email: " + dto.getEmail() + "\n" +
-            "Assunto: " + dto.getSubject() + "\n\n" +
-            "Mensagem:\n" + dto.getMessage()
-        );
-
-        mailSender.send(msg);
+        sendEmail("gustavosimon4g@gmail.com", "Novo contato do site", html);
     }
 }

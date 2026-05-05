@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./Appointment.module.css";
 import { CalendarDays, Clock } from "lucide-react";
+import { api } from "../../services/api";
 
 const timeSlots = [
   "09:00","09:30","10:00","10:30","11:00","11:30",
@@ -61,7 +62,7 @@ export default function Appointment() {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // 🔥 BUSCAR HORÁRIOS OCUPADOS
+  // 🔥 BUSCAR HORÁRIOS OCUPADOS (CORRIGIDO)
   useEffect(() => {
     if (!selectedDate) return;
 
@@ -69,12 +70,9 @@ export default function Appointment() {
       try {
         const formattedDate = selectedDate.toISOString().split("T")[0];
 
-        const res = await fetch(
-          `http://localhost:8080/appointments/times?date=${formattedDate}`
-        );
+        const res = await api.get(`/appointments/times?date=${formattedDate}`);
+        setBookedTimes(res.data);
 
-        const data = await res.json();
-        setBookedTimes(data);
       } catch (err) {
         console.error(err);
       }
@@ -104,7 +102,7 @@ export default function Appointment() {
     return bookedTimes.includes(slot) || isPastTime(slot);
   };
 
-  // 🚀 ENVIO
+  // 🚀 ENVIO (CORRIGIDO)
   const handleSubmit = async () => {
 
     if (!form.name || !form.email || !selectedDate || !selectedTime || !selectedService) {
@@ -121,19 +119,8 @@ export default function Appointment() {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        alert(error);
-        return;
-      }
+      const response = await api.post("/appointments", payload);
+      console.log(response.data);
 
       alert("Agendamento realizado com sucesso!");
 
@@ -151,7 +138,12 @@ export default function Appointment() {
 
     } catch (error) {
       console.error(error);
-      alert("Erro ao enviar agendamento");
+
+      if (error.response?.data) {
+        alert(error.response.data);
+      } else {
+        alert("Erro ao enviar agendamento");
+      }
     }
   };
 
