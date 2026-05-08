@@ -27,7 +27,7 @@ public class EmailService {
             conn.setDoOutput(true);
 
             String body = "{"
-                    + "\"from\": \"onboarding@resend.dev\","
+                    + "\"from\": \"gustavosimon4g@gmail.com\","
                     + "\"to\": [\"" + to + "\"],"
                     + "\"subject\": \"" + subject + "\","
                     + "\"html\": \"" + htmlContent.replace("\"", "\\\"") + "\""
