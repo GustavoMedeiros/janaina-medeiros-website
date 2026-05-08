@@ -17,6 +17,7 @@ public class EmailService {
     private String sendEmail(String to, String subject, String htmlContent) {
         try {
             String apiKey = System.getenv("RESEND_API_KEY");
+            System.out.println("RESEND_API_KEY = " + apiKey);
 
             URL url = new URL(RESEND_API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
