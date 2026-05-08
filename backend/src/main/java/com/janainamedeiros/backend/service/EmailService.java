@@ -14,8 +14,9 @@ public class EmailService {
 
     private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
-    private String sendEmail(String to, String subject, String htmlContent) {
+        private String sendEmail(String to, String subject, String htmlContent) {
         try {
+
             String apiKey = System.getenv("RESEND_API_KEY");
             System.out.println("RESEND_API_KEY = " + apiKey);
 
@@ -27,20 +28,32 @@ public class EmailService {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
+            String escapedHtml = htmlContent
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "")
+                    .replace("\r", "");
+
             String body = "{"
                     + "\"from\": \"JSM Advocacia <contato@janainamedeirosadvocacia.com.br>\","
                     + "\"reply_to\": \"adv.janainamedeiros@gmail.com\","
                     + "\"to\": [\"" + to + "\"],"
                     + "\"subject\": \"" + subject + "\","
-                    + "\"html\": \"" + htmlContent.replace("\"", "\\\"") + "\""
+                    + "\"html\": \"" + escapedHtml + "\""
                     + "}";
 
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(body.getBytes());
+                os.write(body.getBytes("utf-8"));
             }
 
             int responseCode = conn.getResponseCode();
-            System.out.println("Email enviado para " + to + " - Status: " + responseCode);
+
+            System.out.println(
+                    "Email enviado para "
+                            + to
+                            + " - Status: "
+                            + responseCode
+            );
 
             return "OK";
 
